@@ -1,39 +1,71 @@
 import mysql.connector as mysql
 import time
-
-con = mysql.connect(host='localhost',user="u0_a243",passwd="password",database="library" )
-cursor = con.cursor()
+import setupsql
 
 def getRecords(table):
+    con = mysql.connect(host='localhost',user="u0_a243",passwd="password",database="library" )
+
+    if(con.is_connected):
+        cursor = con.cursor()
+    
     cursor.execute(f"SELECT * FROM {table}")
-    data = cursor.fetchall();
+    data = cursor.fetchall()
     res = []
     for row in data:
         res.append({"id":row[0],"name":row[1],"author":row[2],"status":row[3]})
-    return res;
+    con.close()
+    return res
 
 def getColumn(column,table):
+    con = mysql.connect(host='localhost',user="u0_a243",passwd="password",database="library" )
+
+    if(con.is_connected):
+        cursor = con.cursor()
+
     cursor.execute(f"select {column} from {table}")
     data = cursor.fetchall()
+    con.close()
     return data
 
 def addBook(book):
+    con = mysql.connect(host='localhost',user="u0_a243",passwd="password",database="library" )
+
+    if(con.is_connected):
+        cursor = con.cursor()
+
     cursor.execute(f"INSERT INTO books (title,author,status) values ('{book['name']}','{book['author']}','{book['status']}')")
     con.commit()
-    print("\x1b[36m\x1b[5mBook Added successfully!!!")
-    # time.sleep(3)
-    print("\x1b[0m")
+    con.close()
+    print("Book Added successfully!!!")
 
 def issueBook(issuedBook):
+    con = mysql.connect(host='localhost',user="u0_a243",passwd="password",database="library" )
+    
+    if(con.is_connected):
+        cursor = con.cursor()
+
     cursor.execute(f"INSERT INTO issued_books values ({issuedBook['bId']},\"{issuedBook['issuedTo']}\")")
-    updateRec(f"books SET status='issued' where bId={issuedBook['bId']}")
     con.commit()
-    print("\x1b[36mBook Issued Successfully!!!\x1b[0m")
+    con.close()
+    updateRec(f"books SET status='issued' WHERE bId={issuedBook['bId']}")
+    print("Book Issued Successfully!!!")
 
 def deleteRec(command):
+    con = mysql.connect(host='localhost',user="u0_a243",passwd="password",database="library" )
+    
+    if(con.is_connected):
+        cursor = con.cursor()
+
     cursor.execute(f"DELETE FROM {command}")
     con.commit()
+    con.close()
 
 def updateRec(command):
-    cursor.execute(f"UPDATE {command}")
-    con.commit();
+    con = mysql.connect(host='localhost',user="u0_a243",passwd="password",database="library" )
+    
+    if(con.is_connected):
+        cursor = con.cursor()
+        
+        cursor.execute(f"UPDATE {command}")
+        con.commit()
+        con.close()

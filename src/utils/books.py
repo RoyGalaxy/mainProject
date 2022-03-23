@@ -1,37 +1,47 @@
 import database as db
 
 def viewBooks():
-    print("\x1b[36mAvailable books are listed below \x1b[0m")
     books = db.getRecords("books")
-    print("{:<6} {:<25} {:<15} {:<8}".format('Id','Title','Author','status'))
-    print("\x1b[32m",end="")
+    if(len(books) == 0):
+        print("There are no books in your library")
+        return
+    print("Available books are listed below\n")
+    print("{:<6} {:<35} {:<25} {:<8}".format('Id','Title','Author','status'))
+    
     for book in books:
-        print("{:<6} {:<25} {:<15} {:<8}".format(book['id'],book['name'],book['author'],book['status']))
+        print("{:<6} {:<35} {:<25} {:<8}".format(book['id'],book['name'],book['author'],book['status']))
 
 def viewIssued():
-    print("All issued books")
+    print("All issued books are listed below")
+    records = db.getColumn("b.bId,b.title,b.author,ib.issuedTo",
+    "books b INNER JOIN issued_books ib ON b.bId = ib.bId")
+
+    print("{:<8} {:<35} {:25} {:25}".format("Id","Title","Author","Issued To"))
+    for row in records:
+        print("{:<8} {:<35} {:25} {:25}".format(row[0],row[1],row[2],row[3]))
 
 def addBook():
     book = {
-        "name":input("Enter name of book: \x1b[32m"),
-        "author":input("\x1b[0mEnter author name: \x1b[32m"),
+        "name":input("Enter name of book:"),
+        "author":input("Enter author name:"),
         "status":"Available"
     }
-    print("\x1b[0m")
+    
     db.addBook(book)
 
 def removeBook():
-    id = input("\x1b[31mEnter book id to be deleted: ")
+    id = input("Enter book id to be deleted: ")
     db.deleteRec(f"books where bId={id}")
-    print("Book Deleted !!!\x1b[0m")
+    print("Book Deleted !!!")
 
 def issueBook():
     allBid = db.getColumn("bId","books")
     
     # get details from user
-    bId = int(input("Enter book id to be issued: \x1b[32m"))
-    print("\x1b[0m",end="")
+    bId = int(input("Enter book id to be issued: "))
+    
     status = db.getColumn("status",f"books where bId={bId}")[0][0]
+    print(status)
     if(status=="issued"):
         print("Book already issued by someone")
         return
@@ -49,8 +59,8 @@ def issueBook():
 def returnBook():
     allBid = db.getColumn("bId","books")
 
-    bId = int(input("Enter book id to be issued: \x1b[32m"))
-    print("\x1b[0m",end="")
+    bId = int(input("Enter book id to be submitted:"))
+    
     if((bId,) in allBid):
         status = db.getColumn("status",f"books where bId={bId}")[0][0]
         if(status == "Available"):
@@ -58,8 +68,8 @@ def returnBook():
             return
         db.deleteRec(f"issued_books where bId={bId}")
         db.updateRec(f"books set status = 'Available' where bId = {bId}")
-        print("\x1b[36mBook Submitted!!!\x1b[0m")
+        print("Book Submitted!!!")
     else:
-        print("\x1b[31mBook not found in records!!!\x1b[0m")
+        print("Book not found in records!!!")
         return
     
