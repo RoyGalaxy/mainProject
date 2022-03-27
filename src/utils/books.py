@@ -32,7 +32,6 @@ def addBook():
 def removeBook():
     id = input("Enter book id to be deleted: ")
     db.deleteRec(f"books where bId={id}")
-    print("Book Deleted !!!")
 
 def issueBook():
     allBid = db.getColumn("bId","books")

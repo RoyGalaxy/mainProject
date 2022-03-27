@@ -55,10 +55,14 @@ def deleteRec(command):
     
     if(con.is_connected):
         cursor = con.cursor()
-
-    cursor.execute(f"DELETE FROM {command}")
-    con.commit()
-    con.close()
+    try:
+        cursor.execute(f"DELETE FROM {command}")
+        con.commit()
+        con.close()
+        print("Records deleted")
+    except:
+        print("Error Deleting Record")
+        con.close()
 
 def updateRec(command):
     con = mysql.connect(host='localhost',user="u0_a243",passwd="password",database="library" )
